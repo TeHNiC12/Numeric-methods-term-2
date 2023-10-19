@@ -4,10 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Lab_5.MVVM.View"
+        xmlns:viewModel="clr-namespace:Lab_5.MVVM.ViewModel"
+        xmlns:converters="clr-namespace:Lab_5.Converters"
         xmlns:oxy="http://oxyplot.org/wpf" 
         xmlns:math="clr-namespace:WpfMath.Controls;assembly=WpfMath"
         mc:Ignorable="d"
         Title="Lab 5" Height="450" Width="800">
+
+    <Window.DataContext>
+        <viewModel:MainViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <converters:ToStringRoundingConverter x:Key="ToStringRoundingConverter"/>
+    </Window.Resources>
+    
     <Grid Background="#4d4d4d">
         <Grid.RowDefinitions>
             <RowDefinition Height="3*"/>
@@ -133,23 +144,27 @@
                     <UniformGrid Grid.Row="1"
                                  Columns="3">
 
-                        <ToggleButton Grid.Column="0"
-                                      Name="ExplicitMethodToggleButton"
-                                      Style="{StaticResource ToggleButtonTheme}"
-                                      Margin="5,10,5,10"
-                                      Content="Явная"/>
+                        <RadioButton Grid.Column="0"
+                                     Name="ExplicitMethodRadioButton"
+                                     Style="{StaticResource RadioButtonTheme}"
+                                     Margin="5,10,5,10"
+                                     Content="Явная"
+                                     Command="{Binding ToggleExplicitMethodCommand}"
+                                     IsChecked="True"/>
 
-                        <ToggleButton Grid.Column="1"
-                                      Name="ImplicitMethodToggleButton"
-                                      Style="{StaticResource ToggleButtonTheme}"
-                                      Margin="5,10,5,10"
-                                      Content="Неявная"/>
+                        <RadioButton Grid.Column="1"
+                                     Name="ImplicitMethodRadioButton"
+                                     Style="{StaticResource RadioButtonTheme}"
+                                     Margin="5,10,5,10"
+                                     Content="Неявная"
+                                     Command="{Binding ToggleImplicitMethodCommand}"/>
 
-                        <ToggleButton Grid.Column="2"
-                                      Name="CrancNicolsonMethodToggleButton"
-                                      Style="{StaticResource ToggleButtonTheme}"
-                                      Margin="5,10,5,10"
-                                      Content="Кранка"/>
+                        <RadioButton Grid.Column="2"
+                                     Name="CrancNicolsonMethodRadioButton"
+                                     Style="{StaticResource RadioButtonTheme}"
+                                     Margin="5,10,5,10"
+                                     Content="Кранка"
+                                     Command="{Binding ToggleCrancNicolsonMethodCommand}"/>
                     </UniformGrid>
 
                     <Viewbox Grid.Row="2"
@@ -167,19 +182,23 @@
                                      Name="TwoPointFirstOrderRadioButton"
                                      Style="{StaticResource RadioButtonTheme}"
                                      Margin="5,10,5,10"
-                                     Content="Двухточечная ^1"/>
+                                     Content="Двухточечная ^1"
+                                     Command="{Binding ToggleTwoPointFirstOrderCommand}"
+                                     IsChecked="True"/>
 
                         <RadioButton Grid.Column="1"
                                      Name="TwoPointSecondOrderRadioButton"
                                      Style="{StaticResource RadioButtonTheme}"
                                      Margin="5,10,5,10"
-                                     Content="Двухточечная ^2"/>
+                                     Content="Двухточечная ^2"
+                                     Command="{Binding ToggleTwoPointSecondOrderCommand}"/>
 
                         <RadioButton Grid.Column="2"
                                      Name="ThreePointSecondOrderRadioButton"
                                      Style="{StaticResource RadioButtonTheme}"
                                      Margin="5,10,5,10"
-                                     Content="Трехточечная ^2"/>
+                                     Content="Трехточечная ^2"
+                                     Command="{Binding ToggleThreePointSecondOrderCommand}"/>
                     </UniformGrid>
 
                     <Viewbox Grid.Row="4"
@@ -206,8 +225,9 @@
                                 Name="ErrorTimeSlider"
                                 VerticalAlignment="Center"
                                 Margin="5,0,5,0"
-                                Minimum="0"
-                                Maximum="5"
+                                Minimum="{Binding LeftTimeLimit}"
+                                Maximum="{Binding RightTimeLimit}"
+                                Value="{Binding SelectedErrorTime}"
                                 TickPlacement="BottomRight"
                                 TickFrequency="0.5"/>
 
@@ -219,7 +239,7 @@
                                      HorizontalAlignment="Left"
                                      Margin="7,0,0,0">
 
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding LeftTimeLimit, Converter={StaticResource ToStringRoundingConverter}}"
                                            Name="LeftTimeLimitTextBlock"
                                            Foreground="#fff"/>
                             </Viewbox>
@@ -228,7 +248,7 @@
                                      HorizontalAlignment="Right"
                                      Margin="0,0,7,0">
 
-                                <TextBlock Text="5"
+                                <TextBlock Text="{Binding RightTimeLimit, Converter={StaticResource ToStringRoundingConverter}}"
                                            Name="RightTimeLimitTextBlock"
                                            Foreground="#fff"/>
                             </Viewbox>
@@ -238,7 +258,7 @@
                                  Grid.Column="1"
                                  Name="ErrorTimeTextBox"
                                  Margin="10,4,10,4"
-                                 Text="T"
+                                 Text="{Binding SelectedErrorTime, Converter={StaticResource ToStringRoundingConverter}}"
                                  VerticalContentAlignment="Center"
                                  HorizontalContentAlignment="Center"
                                  Style="{StaticResource TextBoxTheme}"/>
@@ -246,6 +266,7 @@
                 </Grid>
 
                 <oxy:PlotView Grid.Column="1"
+                              Model="{Binding Plot}"
                               Margin="3"/>
             </Grid>
         </Border>
@@ -264,7 +285,7 @@
 
                     <StackPanel Orientation="Horizontal">
 
-                        <TextBlock Text="Погрешность метода в момент времени t=69 составляет:"
+                        <TextBlock Text="{Binding ErrorMessage}"
                                    Name="ErrorOutputMessageTextBlock"
                                    Foreground="#fff"/>
 
@@ -279,7 +300,8 @@
                         Name="SolveButton"
                         Margin="5,2,5,2"
                         Content="Решить"
-                        Style="{StaticResource ButtonTheme}"/>
+                        Style="{StaticResource ButtonTheme}"
+                        Command="{Binding SolveCommand}"/>
             </Grid>
         </Border>
     </Grid>
