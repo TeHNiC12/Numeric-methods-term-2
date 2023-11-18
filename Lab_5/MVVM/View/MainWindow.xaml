@@ -9,7 +9,7 @@
         xmlns:oxy="http://oxyplot.org/wpf" 
         xmlns:math="clr-namespace:WpfMath.Controls;assembly=WpfMath"
         mc:Ignorable="d"
-        Title="Lab 5" Height="450" Width="800">
+        Title="Lab 5" Height="600" Width="1000">
 
     <Window.DataContext>
         <viewModel:MainViewModel/>
@@ -229,7 +229,9 @@
                                 Maximum="{Binding RightTimeLimit}"
                                 Value="{Binding SelectedErrorTime}"
                                 TickPlacement="BottomRight"
-                                TickFrequency="0.5"/>
+                                TickFrequency="{Binding TicFrequency}"
+                                LargeChange="0.1"
+                                SmallChange="0.01"/>
 
                         <UniformGrid Grid.Row="1"
                                      Grid.Column="0"
@@ -289,7 +291,7 @@
                                    Name="ErrorOutputMessageTextBlock"
                                    Foreground="#fff"/>
 
-                        <TextBlock Text="0.1337"
+                        <TextBlock Text="{Binding ErrorValue}"
                                    Name="ErrorOutputValueTextBlock"
                                    Foreground="#f55b65"
                                    Margin="10,0,0,0"/>

@@ -1,7 +1,10 @@
 ﻿using Lab_5.Core;
+using Lab_5.DefaultValues;
 using Lab_5.MVVM.Model;
 using OxyPlot;
+using OxyPlot.Annotations;
 using OxyPlot.Axes;
+using OxyPlot.Legends;
 using OxyPlot.Series;
 using System;
 
@@ -9,6 +12,14 @@ namespace Lab_5.MVVM.ViewModel
 {
     public class MainViewModel : ObservableObject
     {
+        public RelayCommand ToggleExplicitMethodCommand { get; set; }
+        public RelayCommand ToggleImplicitMethodCommand { get; set; }
+        public RelayCommand ToggleCrancNicolsonMethodCommand { get; set; }
+        public RelayCommand ToggleTwoPointFirstOrderCommand { get; set; }
+        public RelayCommand ToggleTwoPointSecondOrderCommand { get; set; }
+        public RelayCommand ToggleThreePointSecondOrderCommand { get; set; }
+        public RelayCommand SolveCommand { get; set; }
+
         public double LeftTimeLimit
         {
             get { return leftTimeLimit; }
@@ -19,6 +30,12 @@ namespace Lab_5.MVVM.ViewModel
         {
             get { return rightTimeLimit; }
             set { rightTimeLimit = value; OnPropertyChanged(); }
+        }
+
+        public double TicFrequency
+        {
+            get { return ticFrequency; }
+            set { ticFrequency = value; OnPropertyChanged(); }
         }
 
         public double SelectedErrorTime
@@ -33,27 +50,25 @@ namespace Lab_5.MVVM.ViewModel
             set { errorMessage = value; OnPropertyChanged(); }
         }
 
+        public string ErrorValue
+        {
+            get { return errorValue; }
+            set { errorValue = value; OnPropertyChanged(); }
+        }
 
-        public PlotModel Plot { get; private set; }
-
-        public RelayCommand ToggleExplicitMethodCommand { get; set; }
-        public RelayCommand ToggleImplicitMethodCommand { get; set; }
-        public RelayCommand ToggleCrancNicolsonMethodCommand { get; set; }
-        public RelayCommand ToggleTwoPointFirstOrderCommand { get; set; }
-        public RelayCommand ToggleTwoPointSecondOrderCommand { get; set; }
-        public RelayCommand ToggleThreePointSecondOrderCommand { get; set; }
-        public RelayCommand SolveCommand { get; set; }
-
+        private PlotModel plotModel;
+        public PlotModel PlotModel
+        {
+            get { return plotModel; }
+            set { plotModel = value; OnPropertyChanged(); }
+        }
 
         public MainViewModel ()
         {
             model = new();
-            Plot = InitializePlot();
-            UpdateErrorMessage();
+            plotModel = new();
 
-            xMin = model.XMin;
-            xMax = model.XMax;
-
+            ticFrequency = (rightTimeLimit - leftTimeLimit) / 10;
 
             ToggleExplicitMethodCommand = new RelayCommand(o =>
             {
@@ -67,7 +82,6 @@ namespace Lab_5.MVVM.ViewModel
             {
                 finiteDifferenceMethod = 3;
             });
-
             ToggleTwoPointFirstOrderCommand = new RelayCommand(o =>
             {
                 approximationMethod = 1;
@@ -80,7 +94,6 @@ namespace Lab_5.MVVM.ViewModel
             {
                 approximationMethod = 3;
             });
-
             SolveCommand = new RelayCommand(o =>
             {
                 UpdatePlot();
@@ -111,43 +124,90 @@ namespace Lab_5.MVVM.ViewModel
             return plot;
         }
 
-        private FunctionSeries GetAnaliticalUPlot ()
-        {
-            FunctionSeries series = new(analiticalU, xMin, xMax, 0.01f);
-            return series;
-        }
-
-        private void UpdatePlot ()
-        {
-            Plot.Series.Clear();
-
-            Plot.Series.Add(GetAnaliticalUPlot());
-
-            Plot.InvalidatePlot(true);
-        }
-
-        private double analiticalU (double x)
-        {
-            return model.AnaliticalU(x, SelectedErrorTime);
-        }
-
         private void UpdateErrorMessage ()
         {
             ErrorMessage = String.Format("Погрешность метода в момент времени t={0} составляет:", Math.Round(SelectedErrorTime, 3).ToString());
         }
 
+        private void UpdatePlot ()
+        {
+            plotModel.Annotations.Clear();
+            plotModel.Axes.Clear();
+            plotModel.Legends.Clear();
+            plotModel.Series.Clear();
+
+            var zeroLineY = new LineAnnotation
+            {
+                Type = LineAnnotationType.Horizontal,
+                Y = 0,
+                Color = OxyColors.Black,
+                LineStyle = LineStyle.Solid,
+                StrokeThickness = 1
+            };
+            var zeroLineX = new LineAnnotation
+            {
+                Type = LineAnnotationType.Vertical,
+                X = 0,
+                Color = OxyColors.Black,
+                LineStyle = LineStyle.Solid,
+                StrokeThickness = 1
+            };
+            var xAxis = new LinearAxis
+            {
+                Position = AxisPosition.Bottom,
+                TitleFontSize = 18,
+                Title = "X"
+            };
+            var yAxis = new LinearAxis
+            {
+                Position = AxisPosition.Left,
+                TitleFontSize = 18,
+                Title = "Y"
+            };
+
+            plotModel.Legends.Add(new Legend
+            {
+                LegendPosition = LegendPosition.TopLeft,
+                LegendPlacement = LegendPlacement.Inside
+            });
+
+            plotModel.Annotations.Add(zeroLineX);
+            plotModel.Annotations.Add(zeroLineY);
+            plotModel.Axes.Add(xAxis);
+            plotModel.Axes.Add(yAxis);
+
+            var scatterSeries = new ScatterSeries
+            {
+                MarkerType = MarkerType.Circle,
+                MarkerSize = 6,
+                MarkerStroke = OxyColors.Blue,
+                Title = "Interpolation points"
+            };
+
+            plotModel.Series.Add(new FunctionSeries(analiticalU, Values.xMin, Values.xMax, 0.001f, "Аналитическая функция"));
+
+            plotModel.InvalidatePlot(true);
+        }
+
+        private double analiticalU (double x)
+        {
+            return Values.AnaliticalU(x, SelectedErrorTime);
+        }
+
         private FiniteDifferenceModel model;
 
-        private double leftTimeLimit = -1;
-        private double rightTimeLimit = 1;
+        private double leftTimeLimit = Values.tMin;
+        private double rightTimeLimit = Values.tMax;
+        private double ticFrequency;
         private double selectedErrorTime = 0;
 
         private string errorMessage;
+        private string errorValue;
 
         private int finiteDifferenceMethod = 1;
         private int approximationMethod = 1;
 
-        private double xMin;
-        private double xMax;
+        private double xMin = Values.xMin;
+        private double xMax = Values.xMax;
     }
 }
