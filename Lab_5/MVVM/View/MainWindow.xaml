@@ -6,25 +6,28 @@
         xmlns:local="clr-namespace:Lab_5.MVVM.View"
         xmlns:viewModel="clr-namespace:Lab_5.MVVM.ViewModel"
         xmlns:converters="clr-namespace:Lab_5.Converters"
-        xmlns:oxy="http://oxyplot.org/wpf" 
+        xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:math="clr-namespace:WpfMath.Controls;assembly=WpfMath"
         mc:Ignorable="d"
-        Title="Lab 5" Height="600" Width="1000">
+        Title="Lab 5"
+        Height="600"
+        Width="1000">
 
     <Window.DataContext>
-        <viewModel:MainViewModel/>
+        <viewModel:MainViewModel />
     </Window.DataContext>
 
     <Window.Resources>
-        <converters:ToStringRoundingConverter x:Key="ToStringRoundingConverter"/>
+        <converters:ToStringRoundingConverter x:Key="ToStringRoundingConverter" />
+        <converters:ToStringIntConverter x:Key="ToStringIntConverter" />
     </Window.Resources>
-    
+
     <Grid Background="#4d4d4d">
         <Grid.RowDefinitions>
-            <RowDefinition Height="3*"/>
-            <RowDefinition Height="8*"/>
-            <RowDefinition Height="20*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="8*" />
+            <RowDefinition Height="20*" />
+            <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0"
@@ -34,7 +37,7 @@
             <Viewbox HorizontalAlignment="Left"
                      Margin="5,0,5,0">
                 <TextBlock Text="Решение параболических ДУ конечно-разностным методом"
-                           Foreground="#fff"/>
+                           Foreground="#fff" />
             </Viewbox>
         </Border>
 
@@ -44,15 +47,15 @@
 
             <Grid Margin="0,3,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0"
                       Margin="5,0,0,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="10*"/>
-                        <RowDefinition Height="7*"/>
+                        <RowDefinition Height="10*" />
+                        <RowDefinition Height="7*" />
                     </Grid.RowDefinitions>
 
                     <Viewbox Grid.Row="0"
@@ -60,7 +63,7 @@
                              Margin="0,5,0,0">
 
                         <math:FormulaControl Formula="\text{Задача: }\frac{\partial u}{\partial t}=\frac{\partial ^{2}u}{\partial x^{2}}-3u"
-                                             Foreground="#fff"/>
+                                             Foreground="#fff" />
                     </Viewbox>
 
                     <Viewbox Grid.Row="1"
@@ -68,16 +71,16 @@
                              Margin="0,0,0,5">
 
                         <math:FormulaControl Formula="\text{Аналитическое решение: }U(x,t)=exp(-4t)sin(x)"
-                                             Foreground="#fff"/>
+                                             Foreground="#fff" />
                     </Viewbox>
                 </Grid>
 
                 <Grid Grid.Column="1"
                       Margin="10,0,0,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
 
                     <Viewbox Grid.Row="0"
@@ -85,23 +88,23 @@
                              Margin="4">
 
                         <math:FormulaControl Formula="u_{x}(0,t)=exp(-4t)"
-                                             Foreground="#fff"/>
+                                             Foreground="#fff" />
                     </Viewbox>
-                    
+
                     <Viewbox Grid.Row="1"
                              HorizontalAlignment="Left"
                              Margin="4">
 
                         <math:FormulaControl Formula="u(\pi,t)=exp(-4t)"
-                                             Foreground="#fff"/>
+                                             Foreground="#fff" />
                     </Viewbox>
-                    
+
                     <Viewbox Grid.Row="2"
                              HorizontalAlignment="Left"
                              Margin="4">
 
                         <math:FormulaControl Formula="u(x,0)=sin(x)"
-                                             Foreground="#fff"/>
+                                             Foreground="#fff" />
                     </Viewbox>
                 </Grid>
             </Grid>
@@ -113,24 +116,24 @@
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
 
                 <GridSplitter Grid.Column="0"
                               HorizontalAlignment="Right"
                               VerticalAlignment="Stretch"
                               Background="#4d4d4d"
-                              Width="2"/>
+                              Width="2" />
 
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="1*"/>
-                        <RowDefinition Height="3*"/>
-                        <RowDefinition Height="1*"/>
-                        <RowDefinition Height="3*"/>
-                        <RowDefinition Height="1*"/>
-                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="3*" />
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="3*" />
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="2*" />
                     </Grid.RowDefinitions>
 
                     <Viewbox Grid.Row="0"
@@ -138,33 +141,33 @@
                              Margin="5,0,5,0">
 
                         <TextBlock Text="Схема решения:"
-                                   Foreground="#fff"/>
+                                   Foreground="#fff" />
                     </Viewbox>
 
                     <UniformGrid Grid.Row="1"
                                  Columns="3">
 
-                        <RadioButton Grid.Column="0"
-                                     Name="ExplicitMethodRadioButton"
-                                     Style="{StaticResource RadioButtonTheme}"
-                                     Margin="5,10,5,10"
-                                     Content="Явная"
-                                     Command="{Binding ToggleExplicitMethodCommand}"
-                                     IsChecked="True"/>
+                        <ToggleButton Grid.Column="0"
+                                      Name="ExplicitMethodRadioButton"
+                                      Style="{StaticResource ToggleButtonTheme}"
+                                      Margin="5,10,5,10"
+                                      Content="Явная"
+                                      Command="{Binding ToggleExplicitMethodCommand}"
+                                      IsChecked="true" />
 
-                        <RadioButton Grid.Column="1"
-                                     Name="ImplicitMethodRadioButton"
-                                     Style="{StaticResource RadioButtonTheme}"
-                                     Margin="5,10,5,10"
-                                     Content="Неявная"
-                                     Command="{Binding ToggleImplicitMethodCommand}"/>
+                        <ToggleButton Grid.Column="1"
+                                      Name="ImplicitMethodRadioButton"
+                                      Style="{StaticResource ToggleButtonTheme}"
+                                      Margin="5,10,5,10"
+                                      Content="Неявная"
+                                      Command="{Binding ToggleImplicitMethodCommand}" />
 
-                        <RadioButton Grid.Column="2"
-                                     Name="CrancNicolsonMethodRadioButton"
-                                     Style="{StaticResource RadioButtonTheme}"
-                                     Margin="5,10,5,10"
-                                     Content="Кранка"
-                                     Command="{Binding ToggleCrancNicolsonMethodCommand}"/>
+                        <ToggleButton Grid.Column="2"
+                                      Name="CrancNicolsonMethodRadioButton"
+                                      Style="{StaticResource ToggleButtonTheme}"
+                                      Margin="5,10,5,10"
+                                      Content="Кранка"
+                                      Command="{Binding ToggleCrancNicolsonMethodCommand}" />
                     </UniformGrid>
 
                     <Viewbox Grid.Row="2"
@@ -172,104 +175,137 @@
                              Margin="5,0,5,0">
 
                         <TextBlock Text="Аппроксимация:"
-                                   Foreground="#fff"/>
+                                   Foreground="#fff" />
                     </Viewbox>
 
                     <UniformGrid Grid.Row="3"
                                  Columns="3">
 
-                        <RadioButton Grid.Column="0"
-                                     Name="TwoPointFirstOrderRadioButton"
-                                     Style="{StaticResource RadioButtonTheme}"
-                                     Margin="5,10,5,10"
-                                     Content="Двухточечная ^1"
-                                     Command="{Binding ToggleTwoPointFirstOrderCommand}"
-                                     IsChecked="True"/>
+                        <ToggleButton Grid.Column="0"
+                                      Name="TwoPointFirstOrderRadioButton"
+                                      Style="{StaticResource ToggleButtonTheme}"
+                                      Margin="5,10,5,10"
+                                      Content="2Т. 1П."
+                                      Command="{Binding ToggleTwoPointFirstOrderCommand}"
+                                      IsChecked="true" />
 
-                        <RadioButton Grid.Column="1"
-                                     Name="TwoPointSecondOrderRadioButton"
-                                     Style="{StaticResource RadioButtonTheme}"
-                                     Margin="5,10,5,10"
-                                     Content="Двухточечная ^2"
-                                     Command="{Binding ToggleTwoPointSecondOrderCommand}"/>
+                        <ToggleButton Grid.Column="1"
+                                      Name="ThreePointSecondOrderRadioButton"
+                                      Style="{StaticResource ToggleButtonTheme}"
+                                      Margin="5,10,5,10"
+                                      Content="3Т. 2П."
+                                      Command="{Binding ToggleThreePointSecondOrderCommand}" />
 
-                        <RadioButton Grid.Column="2"
-                                     Name="ThreePointSecondOrderRadioButton"
-                                     Style="{StaticResource RadioButtonTheme}"
-                                     Margin="5,10,5,10"
-                                     Content="Трехточечная ^2"
-                                     Command="{Binding ToggleThreePointSecondOrderCommand}"/>
+                        <ToggleButton Grid.Column="2"
+                                      Name="TwoPointSecondOrderRadioButton"
+                                      Style="{StaticResource ToggleButtonTheme}"
+                                      Margin="5,10,5,10"
+                                      Content="2Т. 2П."
+                                      Command="{Binding ToggleTwoPointSecondOrderCommand}" />
                     </UniformGrid>
 
                     <Viewbox Grid.Row="4"
                              HorizontalAlignment="Left"
                              Margin="5,0,5,0">
 
-                        <TextBlock Text="Момент времени погрешности:"
-                                   Foreground="#fff"/>
+                        <TextBlock Text="Параметры разбиения:"
+                                   Foreground="#fff" 
+                                   Visibility="{Binding SettingsVisible}"/>
                     </Viewbox>
 
-                    <Grid Grid.Row="5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="5*"/>
-                            <ColumnDefinition Width="2*"/>
-                        </Grid.ColumnDefinitions>
+                    <Grid Grid.Row="5"
+                          Visibility="{Binding SettingsVisible}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="1*"/>
-                        </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
 
-                        <Slider Grid.Column="0"
-                                Grid.Row="0"
-                                Name="ErrorTimeSlider"
-                                VerticalAlignment="Center"
-                                Margin="5,0,5,0"
-                                Minimum="{Binding LeftTimeLimit}"
-                                Maximum="{Binding RightTimeLimit}"
-                                Value="{Binding SelectedErrorTime}"
-                                TickPlacement="BottomRight"
-                                TickFrequency="{Binding TicFrequency}"
-                                LargeChange="0.1"
-                                SmallChange="0.01"/>
-
-                        <UniformGrid Grid.Row="1"
+                            <Viewbox Grid.Row="0"
                                      Grid.Column="0"
-                                     Columns="2">
+                                     HorizontalAlignment="Center"
+                                     Margin="5,0,5,0">
 
-                            <Viewbox Grid.Column="0"
+                                <TextBlock Text="T:"
+                                           Foreground="#fff" />
+                            </Viewbox>
+
+                            <TextBox Grid.Row="1"
+                                     Grid.Column="0"
+                                     Name="TimeTextBox"
+                                     Margin="10,4,10,4"
+                                     Text="{Binding RightTimeLimit, Converter={StaticResource ToStringRoundingConverter}}"
+                                     VerticalContentAlignment="Center"
+                                     HorizontalContentAlignment="Center"
+                                     Style="{StaticResource TextBoxTheme}" />
+
+                            <Viewbox Grid.Row="0"
+                                     Grid.Column="1"
+                                     HorizontalAlignment="Center"
+                                     Margin="5,0,5,0">
+
+                                <TextBlock Text="N:"
+                                           Foreground="#fff" />
+                            </Viewbox>
+
+                            <Viewbox Grid.Row="1"
+                                     Grid.Column="1"
+                                     HorizontalAlignment="Center"
+                                     Margin="5,0,5,0">
+
+                                <TextBlock Text="K:"
+                                           Foreground="#fff" />
+                            </Viewbox>
+
+                            <TextBox Grid.Row="0"
+                                     Grid.Column="2"
+                                     Name="NTextBox"
+                                     Margin="10,4,10,4"
+                                     Text="{Binding N, Converter={StaticResource ToStringIntConverter}}"
+                                     VerticalContentAlignment="Center"
+                                     HorizontalContentAlignment="Center"
+                                     Style="{StaticResource TextBoxTheme}" />
+
+                            <TextBox Grid.Row="1"
+                                     Grid.Column="2"
+                                     Name="KTextBox"
+                                     Margin="10,4,10,4"
+                                     Text="{Binding K, Converter={StaticResource ToStringIntConverter}}"
+                                     VerticalContentAlignment="Center"
+                                     HorizontalContentAlignment="Center"
+                                     Style="{StaticResource TextBoxTheme}" />
+
+                            <Viewbox Grid.Row="0"
+                                     Grid.Column="3"
                                      HorizontalAlignment="Left"
-                                     Margin="7,0,0,0">
+                                     Margin="5,0,5,0">
 
-                                <TextBlock Text="{Binding LeftTimeLimit, Converter={StaticResource ToStringRoundingConverter}}"
-                                           Name="LeftTimeLimitTextBlock"
-                                           Foreground="#fff"/>
+                                <TextBlock Text="{Binding H, Converter={StaticResource ToStringRoundingConverter}, StringFormat='h = {0}'}"
+                                           Foreground="#fff" />
                             </Viewbox>
 
-                            <Viewbox Grid.Column="1"
-                                     HorizontalAlignment="Right"
-                                     Margin="0,0,7,0">
+                            <Viewbox Grid.Row="1"
+                                     Grid.Column="3"
+                                     HorizontalAlignment="Left"
+                                     Margin="5,0,5,0">
 
-                                <TextBlock Text="{Binding RightTimeLimit, Converter={StaticResource ToStringRoundingConverter}}"
-                                           Name="RightTimeLimitTextBlock"
-                                           Foreground="#fff"/>
+                                <TextBlock Text="{Binding Thao, Converter={StaticResource ToStringRoundingConverter}, StringFormat='𝜏 = {0}'}"
+                                           Foreground="#fff" />
                             </Viewbox>
-                        </UniformGrid>
-
-                        <TextBox Grid.Row="0"
-                                 Grid.Column="1"
-                                 Name="ErrorTimeTextBox"
-                                 Margin="10,4,10,4"
-                                 Text="{Binding SelectedErrorTime, Converter={StaticResource ToStringRoundingConverter}}"
-                                 VerticalContentAlignment="Center"
-                                 HorizontalContentAlignment="Center"
-                                 Style="{StaticResource TextBoxTheme}"/>
+                        </Grid>
                     </Grid>
                 </Grid>
 
                 <oxy:PlotView Grid.Column="1"
-                              Model="{Binding Plot}"
-                              Margin="3"/>
+                              Model="{Binding PlotModel}"
+                              Margin="3" />
             </Grid>
         </Border>
 
@@ -278,32 +314,99 @@
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="7*"/>
-                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
 
-                <Viewbox Grid.Column="0"
-                         HorizontalAlignment="Left">
-
-                    <StackPanel Orientation="Horizontal">
-
-                        <TextBlock Text="{Binding ErrorMessage}"
-                                   Name="ErrorOutputMessageTextBlock"
-                                   Foreground="#fff"/>
-
-                        <TextBlock Text="{Binding ErrorValue}"
-                                   Name="ErrorOutputValueTextBlock"
-                                   Foreground="#f55b65"
-                                   Margin="10,0,0,0"/>
-                    </StackPanel>
-                </Viewbox>
-
-                <Button Grid.Column="1"
+                <Button Grid.Column="0"
                         Name="SolveButton"
                         Margin="5,2,5,2"
                         Content="Решить"
                         Style="{StaticResource ButtonTheme}"
-                        Command="{Binding SolveCommand}"/>
+                        Command="{Binding SolveCommand}" />
+
+                <ToggleButton Grid.Column="1"
+                        Name="ThaoErrorButton"
+                        Margin="5,2,5,2"
+                        Content="Погрешность от 𝜏"
+                        Style="{StaticResource ToggleButtonTheme}"
+                        Command="{Binding ToggleThaoErrorCommand}"
+                              Visibility="Hidden" />
+                
+                <ToggleButton Grid.Column="2"
+                        Name="hErrorButton"
+                        Margin="5,2,5,2"
+                        Content="Погрешность от h"
+                        Style="{StaticResource ToggleButtonTheme}"
+                        Command="{Binding ToggleHErrorCommand}" />
+
+                <Grid Grid.Column="3"
+                      Visibility="{Binding SettingsVisible}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+
+                    <Slider Grid.Column="0"
+                            Grid.Row="0"
+                            Name="SelectedTimeSlider"
+                            VerticalAlignment="Center"
+                            Margin="5,0,5,0"
+                            Minimum="{Binding LeftTimeLimit}"
+                            Maximum="{Binding RightTimeLimit}"
+                            Value="{Binding SelectedTimeMoment}"
+                            TickPlacement="BottomRight"
+                            TickFrequency="{Binding TicFrequency}"
+                            LargeChange="{Binding Thao}"
+                            SmallChange="{Binding Thao}" />
+
+                    <UniformGrid Grid.Row="1"
+                                 Grid.Column="0"
+                                 Columns="2">
+
+                        <Viewbox Grid.Column="0"
+                                 HorizontalAlignment="Left"
+                                 Margin="7,0,0,0">
+
+                            <TextBlock Text="0"
+                                       Name="LeftTimeLimitTextBlock"
+                                       Foreground="#fff" />
+                        </Viewbox>
+
+                        <Viewbox Grid.Column="1"
+                                 HorizontalAlignment="Right"
+                                 Margin="0,0,7,0">
+
+                            <TextBlock Text="{Binding RightTimeLimit, Converter={StaticResource ToStringRoundingConverter}}"
+                                       Name="RightTimeLimitTextBlock"
+                                       Foreground="#fff" />
+                        </Viewbox>
+                    </UniformGrid>
+
+                    <TextBox Grid.Row="0"
+                             Grid.Column="1"
+                             Name="SelectedTimeTextBox"
+                             Margin="10,4,10,4"
+                             Text="{Binding SelectedTimeMoment, Converter={StaticResource ToStringRoundingConverter}}"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Center"
+                             Style="{StaticResource TextBoxTheme}" />
+                </Grid>
+                
+                <Button Grid.Column="4"
+                        Name="PopOutButton"
+                        Margin="5,2,5,2"
+                        Content="Извлечь"
+                        Style="{StaticResource ButtonTheme}"
+                        Command="{Binding PopOutCommand}" />
             </Grid>
         </Border>
     </Grid>

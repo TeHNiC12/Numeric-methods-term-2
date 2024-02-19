@@ -14,7 +14,7 @@
 
                 <ResourceDictionary Source="Themes/ButtonTheme.xaml"/>
 
-                <ResourceDictionary Source="Themes/RadioButtonTheme.xaml"/>
+                <ResourceDictionary Source="Themes/ToggleButtonTheme.xaml"/>
 
                 <ResourceDictionary Source="Themes/TextBoxTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
