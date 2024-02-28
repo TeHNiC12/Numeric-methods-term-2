@@ -19,7 +19,7 @@ namespace Lab_5.DefaultValues
 
         public static Func<double, double, double> fX = (x, t) => 0;
         public static Func<double, double> phi1 = t => Math.Exp(-4f * t);
-        public static Func<double, double> phi2 = t => Math.Exp(-4f * t);
+        public static Func<double, double> phi2 = t => 0;
         public static Func<double, double> psi = x => Math.Sin(x);
     }
 

@@ -1,6 +1,6 @@
-﻿using Lab_7.Core;
-using Lab_7.DefaultValues;
-using Lab_7.MVVM.Model;
+﻿using Lab_8.Core;
+using Lab_8.DefaultValues;
+using Lab_8.MVVM.Model;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
@@ -9,19 +9,18 @@ using OxyPlot.Series;
 using SciChart.Charting3D.Model;
 using System.Windows;
 
-namespace Lab_7.MVVM.ViewModel
+namespace Lab_8.MVVM.ViewModel
 {
     public class MainViewModel : ObservableObject
     {
-        public RelayCommand ToggleLibmanMethodCommand { get; set; }
-        public RelayCommand ToggleZeidelMethodCommand { get; set; }
-        public RelayCommand ToggleLibmanRelaxedMethodCommand { get; set; }
+        public RelayCommand ToggleCDSchemeCommand { get; set; }
+        public RelayCommand TogglePSSchemeCommand { get; set; }
 
         public RelayCommand ToggleHxErrorCommand { get; set; }
         public RelayCommand ToggleHyErrorCommand { get; set; }
 
-        public RelayCommand TrueFxyCommand { get; set; }
-        public RelayCommand ErrorFxyUxyCommand { get; set; }
+        public RelayCommand ToggleTrueFxyCommand { get; set; }
+        public RelayCommand ToggleErrorFxyUxyCommand { get; set; }
 
         public RelayCommand SolveCommand { get; set; }
         public RelayCommand PopOutCommand { get; set; }
@@ -48,15 +47,56 @@ namespace Lab_7.MVVM.ViewModel
             set { hY = value; OnPropertyChanged(); }
         }
 
-        public double Omega
+        public int K
         {
-            get { return omega; }
-            set { omega = value; OnPropertyChanged(); }
+            get { return k; }
+            set { k = value; UpdateGridPar(); OnPropertyChanged(); }
         }
-        public double Epsilon
+        public double Thao
         {
-            get { return epsilon; }
-            set { epsilon = value; OnPropertyChanged(); }
+            get { return thao; }
+            set { thao = value; OnPropertyChanged(); }
+        }
+        public double T
+        {
+            get { return t; }
+            set { t = value; UpdateGridPar(); OnPropertyChanged(); }
+        }
+
+        public double TicFrequency
+        {
+            get { return ticFrequency; }
+            set { ticFrequency = value; OnPropertyChanged(); }
+        }
+        public double SelectedTimeMoment
+        {
+            get { return selectedTimeMoment; }
+            set
+            {
+                if (value % thao < 0.5 * thao)
+                {
+                    selectedTimePoint = (int) (value / thao);
+                    selectedTimeMoment = selectedTimePoint * thao;
+                }
+                else
+                {
+                    selectedTimePoint = (int) (value / thao) + 1;
+                    if (selectedTimePoint > k)
+                    {
+                        selectedTimePoint = k;
+                    }
+                    selectedTimeMoment = selectedTimePoint * thao;
+                }
+                OnPropertyChanged();
+                try
+                {
+                    UpdatePlot3D();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
 
         public string SettingsVisible
@@ -68,12 +108,6 @@ namespace Lab_7.MVVM.ViewModel
         {
             get { return plotVisible; }
             set { plotVisible = value; OnPropertyChanged(); }
-        }
-
-        public int EndStep
-        {
-            get { return endStep; }
-            set { endStep = value; OnPropertyChanged(); }
         }
 
 
@@ -93,46 +127,35 @@ namespace Lab_7.MVVM.ViewModel
             model = new();
             plotModel = InitializePlot();
 
-            libmanMethod = 1;
+            cDScheme = 1;
             SettingsVisible = "Visible";
             PlotVisible = "Hidden";
 
             NX = 10;
             NY = 10;
-            Epsilon = 0.001f;
-            Omega = 1.7f;
+            T = 1f;
+            K = 10;
 
-            ToggleLibmanMethodCommand = new RelayCommand(o =>
+            ToggleCDSchemeCommand = new RelayCommand(o =>
             {
-                if (libmanMethod == 1)
+                if (cDScheme == 1)
                 {
-                    libmanMethod = 0;
+                    cDScheme = 0;
                 }
                 else
                 {
-                    libmanMethod = 1;
+                    cDScheme = 1;
                 }
             });
-            ToggleZeidelMethodCommand = new RelayCommand(o =>
+            TogglePSSchemeCommand = new RelayCommand(o =>
             {
-                if (zeidelMethod == 1)
+                if (pSScheme == 1)
                 {
-                    zeidelMethod = 0;
+                    pSScheme = 0;
                 }
                 else
                 {
-                    zeidelMethod = 1;
-                }
-            });
-            ToggleLibmanRelaxedMethodCommand = new RelayCommand(o =>
-            {
-                if (libmanRelaxedMethod == 1)
-                {
-                    libmanRelaxedMethod = 0;
-                }
-                else
-                {
-                    libmanRelaxedMethod = 1;
+                    pSScheme = 1;
                 }
             });
 
@@ -173,13 +196,48 @@ namespace Lab_7.MVVM.ViewModel
                 }
             });
 
+            ToggleTrueFxyCommand = new RelayCommand(o =>
+            {
+                if (trueFxy == 1)
+                {
+                    trueFxy = 0;
+                }
+                else
+                {
+                    trueFxy = 1;
+                }
+            });
+            ToggleErrorFxyUxyCommand = new RelayCommand(o =>
+            {
+                if (errorFxyUxy == 1)
+                {
+                    errorFxyUxy = 0;
+                }
+                else
+                {
+                    errorFxyUxy = 1;
+                }
+            });
+
             SolveCommand = new RelayCommand(o =>
             {
-                if (libmanMethod + zeidelMethod + libmanRelaxedMethod > 1)
+                if (cDScheme + pSScheme > 1)
                 {
                     MessageBox.Show("Сравнение методов решения невозможно");
                 }
-                else if (hX == 0 | hY == 0)
+                else if ((hXError + hYError > 0) & (trueFxy + errorFxyUxy > 0))
+                {
+                    MessageBox.Show("Выберите опцию только из одного раздела");
+                }
+                else if ((cDScheme + pSScheme > 0) & trueFxy == 1)
+                {
+                    MessageBox.Show("Построение графика решения и аналитического графика одновременно невозможно");
+                }
+                else if (trueFxy + errorFxyUxy > 1)
+                {
+                    MessageBox.Show("Построения аналитического решения и графика ошибки одновременно невозможно");
+                }
+                else if (hX == 0 | hY == 0 | thao == 0)
                 {
                     MessageBox.Show("Сеточные параметры не могут быть равны 0");
                 }
@@ -193,6 +251,8 @@ namespace Lab_7.MVVM.ViewModel
                     {
                         if (hXError + hYError == 0)
                         {
+                            U1 = model.FiniteDifferenceSolve(nX, nY, k, t, 1);
+                            U2 = model.FiniteDifferenceSolve(nX, nY, k, t, 2);
                             UpdatePlot3D();
                         }
                         else
@@ -207,14 +267,7 @@ namespace Lab_7.MVVM.ViewModel
                     }
                 }
             });
-            TrueFxyCommand = new RelayCommand(o =>
-            {
-                UpdateAnaliticalPlot3D();
-            });
-            ErrorFxyUxyCommand = new RelayCommand(o =>
-            {
-                UpdateErrorPlot3D();
-            });
+
             /*PopOutCommand = new RelayCommand(o =>
             {
                 string title = "";
@@ -365,204 +418,172 @@ namespace Lab_7.MVVM.ViewModel
 
         private void UpdatePlot3D ()
         {
-            if (libmanMethod == 1)
+            if (cDScheme == 1)
             {
-                Tuple<double[,], int> result = model.FiniteDifferenceSolve(nX, nY, epsilon, 1, omega);
-                double[,] U = result.Item1;
-                EndStep = result.Item2;
+                if (errorFxyUxy == 1)
+                {
+                    if (U1 == null)
+                    {
+                        throw new Exception("Нажмите кнопку Решить");
+                    }
+                    var meshDataSeries = new UniformGridDataSeries3D<double>(nX + 1, nY + 1)
+                    {
+                        StartX = 0,
+                        StepX = hX,
+                        StartZ = 0,
+                        StepZ = hY,
+                        SeriesName = $"График ошибок для метода переменных направлений в момент времени t = {selectedTimeMoment}",
+                    };
+                    for (int x = 0; x <= nX; x++)
+                    {
+                        for (int y = 0; y <= nY; y++)
+                        {
+                            meshDataSeries[y, x] = Math.Abs(Values.AnaliticalU(hX * x, hY * y, selectedTimePoint * thao) - U1[x, y, selectedTimePoint]);
+                        }
+                    }
+                    MeshDataSeries = meshDataSeries;
+                }
+                else
+                {
+                    if (U1 == null)
+                    {
+                        throw new Exception("Нажмите кнопку Решить");
+                    }
+                    var meshDataSeries = new UniformGridDataSeries3D<double>(nX + 1, nY + 1)
+                    {
+                        StartX = 0,
+                        StepX = hX,
+                        StartZ = 0,
+                        StepZ = hY,
+                        SeriesName = $"График решения методом переменных направлений в момент времени t = {selectedTimeMoment}",
+                    };
+                    for (int x = 0; x <= nX; x++)
+                    {
+                        for (int y = 0; y <= nY; y++)
+                        {
+                            meshDataSeries[y, x] = U1[x, y, selectedTimePoint];
+                        }
+                    }
+                    MeshDataSeries = meshDataSeries;
+                }
+            }
+            else if (pSScheme == 1)
+            {
+                if (errorFxyUxy == 1)
+                {
+                    if (U2 == null)
+                    {
+                        throw new Exception("Нажмите кнопку Решить");
+                    }
+                    var meshDataSeries = new UniformGridDataSeries3D<double>(nX + 1, nY + 1)
+                    {
+                        StartX = 0,
+                        StepX = hX,
+                        StartZ = 0,
+                        StepZ = hY,
+                        SeriesName = $"График ошибок для метода переменных направлений в момент времени t = {selectedTimeMoment}",
+                    };
+                    for (int x = 0; x <= nX; x++)
+                    {
+                        for (int y = 0; y <= nY; y++)
+                        {
+                            meshDataSeries[y, x] = Math.Abs(Values.AnaliticalU(hX * x, hY * y, selectedTimePoint * thao) - U2[x, y, selectedTimePoint]);
+                        }
+                    }
+                    MeshDataSeries = meshDataSeries;
+                }
+                else
+                {
+                    if (U2 == null)
+                    {
+                        throw new Exception("Нажмите кнопку Решить");
+                    }
+                    var meshDataSeries = new UniformGridDataSeries3D<double>(nX + 1, nY + 1)
+                    {
+                        StartX = 0,
+                        StepX = hX,
+                        StartZ = 0,
+                        StepZ = hY,
+                        SeriesName = $"График решения методом переменных направлений в момент времени t = {selectedTimeMoment}",
+                    };
+                    for (int x = 0; x <= nX; x++)
+                    {
+                        for (int y = 0; y <= nY; y++)
+                        {
+                            meshDataSeries[y, x] = U2[x, y, selectedTimePoint];
+                        }
+                    }
+                    MeshDataSeries = meshDataSeries;
+                }
+            }
+            else if (trueFxy == 1)
+            {
                 var meshDataSeries = new UniformGridDataSeries3D<double>(nX + 1, nY + 1)
                 {
                     StartX = 0,
                     StepX = hX,
                     StartZ = 0,
                     StepZ = hY,
-                    SeriesName = "График ошибок для метода Либмана",
+                    SeriesName = $"Аналитическое решение в момент времени t = {selectedTimeMoment}",
                 };
                 for (int x = 0; x <= nX; x++)
                 {
                     for (int y = 0; y <= nY; y++)
                     {
-                        meshDataSeries[y, x] = U[x, y];
+                        meshDataSeries[y, x] = Values.AnaliticalU(hX * x, hY * y, selectedTimePoint * thao);
                     }
                 }
                 MeshDataSeries = meshDataSeries;
             }
-            if (zeidelMethod == 1)
+            else
             {
-                Tuple<double[,], int> result = model.FiniteDifferenceSolve(nX, nY, epsilon, 2, omega);
-                double[,] U = result.Item1;
-                EndStep = result.Item2;
-                var meshDataSeries = new UniformGridDataSeries3D<double>(nX + 1, nY + 1)
-                {
-                    StartX = 0,
-                    StepX = hX,
-                    StartZ = 0,
-                    StepZ = hY,
-                    SeriesName = "График ошибок для метода Зейделя",
-                };
-                for (int x = 0; x <= nX; x++)
-                {
-                    for (int y = 0; y <= nY; y++)
-                    {
-                        meshDataSeries[y, x] = U[x, y];
-                    }
-                }
-                MeshDataSeries = meshDataSeries;
-            }
-            if (libmanRelaxedMethod == 1)
-            {
-                Tuple<double[,], int> result = model.FiniteDifferenceSolve(nX, nY, epsilon, 3, omega);
-                double[,] U = result.Item1;
-                EndStep = result.Item2;
-                var meshDataSeries = new UniformGridDataSeries3D<double>(nX + 1, nY + 1)
-                {
-                    StartX = 0,
-                    StepX = hX,
-                    StartZ = 0,
-                    StepZ = hY,
-                    SeriesName = "График ошибок для метода Либмана рел.",
-                };
-                for (int x = 0; x <= nX; x++)
-                {
-                    for (int y = 0; y <= nY; y++)
-                    {
-                        meshDataSeries[y, x] = U[x, y];
-                    }
-                }
-                MeshDataSeries = meshDataSeries;
-            }
-        }
-
-        private void UpdateAnaliticalPlot3D ()
-        {
-            var meshDataSeries = new UniformGridDataSeries3D<double>(nX + 1, nY + 1)
-            {
-                StartX = 0,
-                StepX = hX,
-                StartZ = 0,
-                StepZ = hY,
-                SeriesName = "Аналитическое решение",
-            };
-            for (int x = 0; x <= nX; x++)
-            {
-                for (int y = 0; y <= nY; y++)
-                {
-                    meshDataSeries[y, x] = Values.AnaliticalU(hX * x, hY * y);
-                }
-            }
-            MeshDataSeries = meshDataSeries;
-        }
-
-        private void UpdateErrorPlot3D ()
-        {
-            if (libmanMethod == 1)
-            {
-                double[,] U = model.FiniteDifferenceSolve(nX, nY, epsilon, 1, omega).Item1;
-                var meshDataSeries = new UniformGridDataSeries3D<double>(nX + 1, nY + 1)
-                {
-                    StartX = 0,
-                    StepX = hX,
-                    StartZ = 0,
-                    StepZ = hY,
-                    SeriesName = "График ошибок для метода Либмана",
-                };
-                for (int x = 0; x <= nX; x++)
-                {
-                    for (int y = 0; y <= nY; y++)
-                    {
-                        meshDataSeries[y, x] = Math.Abs(Values.AnaliticalU(hX * x, hY * y) - U[x, y]);
-                    }
-                }
-                MeshDataSeries = meshDataSeries;
-            }
-            if (zeidelMethod == 1)
-            {
-                double[,] U = model.FiniteDifferenceSolve(nX, nY, epsilon, 2, omega).Item1;
-                var meshDataSeries = new UniformGridDataSeries3D<double>(nX + 1, nY + 1)
-                {
-                    StartX = 0,
-                    StepX = hX,
-                    StartZ = 0,
-                    StepZ = hY,
-                    SeriesName = "График ошибок для метода Зейделя",
-                };
-                for (int x = 0; x <= nX; x++)
-                {
-                    for (int y = 0; y <= nY; y++)
-                    {
-                        meshDataSeries[y, x] = Math.Abs(Values.AnaliticalU(hX * x, hY * y) - U[x, y]);
-                    }
-                }
-                MeshDataSeries = meshDataSeries;
-            }
-            if (libmanRelaxedMethod == 1)
-            {
-                double[,] U = model.FiniteDifferenceSolve(nX, nY, epsilon, 3, omega).Item1;
-                var meshDataSeries = new UniformGridDataSeries3D<double>(nX + 1, nY + 1)
-                {
-                    StartX = 0,
-                    StepX = hX,
-                    StartZ = 0,
-                    StepZ = hY,
-                    SeriesName = "График ошибок для метода Либмана рел.",
-                };
-                for (int x = 0; x <= nX; x++)
-                {
-                    for (int y = 0; y <= nY; y++)
-                    {
-                        meshDataSeries[y, x] = Math.Abs(Values.AnaliticalU(hX * x, hY * y) - U[x, y]);
-                    }
-                }
-                MeshDataSeries = meshDataSeries;
+                throw new Exception("Действие не выбрано");
             }
         }
 
         private List<PlotData> CalculateHErrorPoints2D ()
         {
             List<PlotData> plotsData = new();
-            int nMin = 5;
-            int stepSize = 3;
-            int steps = 5;
-            int n2 = 5;
+            int nMin = 10;
+            int stepSize = 10;
+            int steps = 10;
+            int n2 = 10;
+            double t = 1f;
+            int k = 10;
+            int timeMoment = 3;
+
 
             if (hXError == 1)
             {
-                if (libmanMethod == 1)
+                if (cDScheme == 1)
                 {
-                    plotsData.Add(ConstructErrorData(1, "Либман", nMin, stepSize, steps, n2, 1));
+                    plotsData.Add(ConstructErrorData(1, "Переменные направления", nMin, stepSize, steps, n2, t, k, timeMoment, 1));
                 }
-                if (zeidelMethod == 1)
+                if (pSScheme == 1)
                 {
-                    plotsData.Add(ConstructErrorData(1, "Зейдель", nMin, stepSize, steps, n2, 2));
-                }
-                if (libmanRelaxedMethod == 1)
-                {
-                    plotsData.Add(ConstructErrorData(1, "Либман рел.", nMin, stepSize, steps, n2, 3));
+                    plotsData.Add(ConstructErrorData(1, "Дробные шаги", nMin, stepSize, steps, n2, t, k, timeMoment, 2));
                 }
             }
             if (hYError == 1)
             {
-                if (libmanMethod == 1)
+                if (cDScheme == 1)
                 {
-                    plotsData.Add(ConstructErrorData(2, "Либман", nMin, stepSize, steps, n2, 1));
+                    plotsData.Add(ConstructErrorData(2, "Переменные направления", nMin, stepSize, steps, n2, t, k, timeMoment, 1));
                 }
-                if (zeidelMethod == 1)
+                if (pSScheme == 1)
                 {
-                    plotsData.Add(ConstructErrorData(2, "Зейдель", nMin, stepSize, steps, n2, 2));
-                }
-                if (libmanRelaxedMethod == 1)
-                {
-                    plotsData.Add(ConstructErrorData(2, "Либман рел.", nMin, stepSize, steps, n2, 3));
+                    plotsData.Add(ConstructErrorData(2, "Дробные шаги", nMin, stepSize, steps, n2, t, k, timeMoment, 2));
                 }
             }
             return plotsData;
         }
 
-        private PlotData ConstructErrorData (int mode, string title, int nMin, int stepSize, int steps, int n2, int solver)
+        private PlotData ConstructErrorData (int mode, string title, int nMin, int stepSize, int steps, int n2, double t, int k, int timePoint, int solver)
         {
             PlotData plotData = new();
             plotData.title = title;
             double[,] errorPoints = new double[2, steps];
+            double thao = t / k;
 
             if (mode == 1)
             {
@@ -571,7 +592,7 @@ namespace Lab_7.MVVM.ViewModel
                 {
                     int n = nMin + s * stepSize;
                     double hX = Values.lX / n;
-                    double[,] eU = model.FiniteDifferenceSolve(n, n2, epsilon, solver, omega).Item1;
+                    double[,,] eU = model.FiniteDifferenceSolve(n, n2, k, t, solver);
 
                     double errorSumm = 0;
                     int errorPointsAmount = 0;
@@ -579,12 +600,11 @@ namespace Lab_7.MVVM.ViewModel
                     {
                         for (int j = 0; j <= n2; j++)
                         {
-                            errorSumm += Math.Pow(Values.AnaliticalU(i * hX, j * hY) - eU[i, j], 2);
+                            errorSumm += Math.Pow(Values.AnaliticalU(i * hX, j * hY, timePoint * thao) - eU[i, j, timePoint], 2);
                             errorPointsAmount += 1;
                         }
                     }
                     //MessageBox.Show($"Шаг = {hX} Ошибка = {errorSumm / errorPointsAmount} количество точек {errorPointsAmount} {steps - s - 1}");
-                    //errorPoints[0, s] = hX;
                     errorPoints[0, steps - s - 1] = hX;
                     errorPoints[1, steps - s - 1] = errorSumm / errorPointsAmount;
                     //errorPoints[1, s] = errorSumm / errorPointsAmount;
@@ -597,7 +617,7 @@ namespace Lab_7.MVVM.ViewModel
                 {
                     int n = nMin + s * stepSize;
                     double hY = Values.lY / n;
-                    double[,] eU = model.FiniteDifferenceSolve(n2, n, epsilon, solver, omega).Item1;
+                    double[,,] eU = model.FiniteDifferenceSolve(n2, n, k, t, solver);
 
                     double errorSumm = 0;
                     int errorPointsAmount = 0;
@@ -605,13 +625,12 @@ namespace Lab_7.MVVM.ViewModel
                     {
                         for (int j = 0; j <= n; j++)
                         {
-                            errorSumm += Math.Pow(Values.AnaliticalU(i * hX, j * hY) - eU[i, j], 2);
+                            errorSumm += Math.Pow(Values.AnaliticalU(i * hX, j * hY, timePoint * thao) - eU[i, j, timePoint], 2);
                             errorPointsAmount += 1;
                         }
                     }
                     //MessageBox.Show($"Шаг = {hY} Ошибка = {errorSumm / errorPointsAmount} количество точек {errorPointsAmount} {steps - s - 1}");
-                    //errorPoints[0, s] = hY;
-                    //errorPoints[0, steps - s - 1] = hY;
+                    errorPoints[0, steps - s - 1] = hY;
                     errorPoints[1, steps - s - 1] = errorSumm / errorPointsAmount;
                     //errorPoints[1, s] = errorSumm / errorPointsAmount;
                 }
@@ -625,12 +644,17 @@ namespace Lab_7.MVVM.ViewModel
         {
             HX = xMax / nX;
             HY = yMax / nY;
+            Thao = t / k;
+            TicFrequency = T / 10;
         }
 
         private PlotModel plotModel;
         private UniformGridDataSeries3D<double> meshDataSeries;
         private FiniteDifferenceModel model;
         private List<PlotData> plots;
+
+        private double[,,] U1;
+        private double[,,] U2;
 
         private double xMax = Values.lX;
         private int nX;
@@ -640,18 +664,24 @@ namespace Lab_7.MVVM.ViewModel
         private int nY;
         private double hY;
 
-        private double omega;
-        private double epsilon;
+        private double t;
+        private double thao;
+        private int k;
 
-        private int libmanMethod = 0;
-        private int zeidelMethod = 0;
-        private int libmanRelaxedMethod = 0;
+        private double ticFrequency;
+        private double selectedTimeMoment = 0f;
+        private int selectedTimePoint;
+
+        private int cDScheme = 0;
+        private int pSScheme = 0;
 
         private int hXError = 0;
         private int hYError = 0;
 
+        private int trueFxy = 0;
+        private int errorFxyUxy = 0;
+
         private string settingsVisible;
         private string plotVisible;
-        private int endStep;
     }
 }

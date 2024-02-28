@@ -190,8 +190,10 @@ namespace Lab_7.MVVM.Model
                     U[i, nY] = phi4(i * hX);
                 }
             }
-
-            U = InterpolateInnerValues(U, nX, nY);
+            if (alpha1 + alpha2 + alpha3 + alpha4 != 0)
+            {
+                U = InterpolateInnerValues(U, nX, nY);
+            }
 
             U = UpdateBorderValues(U, nX, hX, nY, hY);
 
@@ -207,6 +209,7 @@ namespace Lab_7.MVVM.Model
                     /*//U[i, j] = (1 - alpha1) * (i / (double) nX) * U[0, j] + (1 - alpha2) * ((nX - i) / (double) nX) * U[nX, j] + (1 - alpha3) * (j / (double) nY) * U[i, 0] + (1 - alpha4) * ((nY - j) / (double) nY) * U[i, nY];
                     U[i, j] = (i / (double) (i + j)) * U[i, 0] + (i / (double) (i + j)) * U[0, j];*/
                     U[i, j] = ((nY - j) / (double) (nX + nY - i - j)) * U[nX, j] + ((nX - i) / (double) (nX + nY - i - j)) * U[i, nY];
+                    //U[i, j] = ((nY - j) / (double) (nX + nY - i - j)) * U[i, nY] + ((nX - i) / (double) (nX + nY - i - j)) * U[nX, j];
                 }
             }
             return U;
@@ -234,30 +237,34 @@ namespace Lab_7.MVVM.Model
         {
             if (alpha1 == 1)
             {
-                for (int j = 0; j <= nY; j++)
+                for (int j = 1; j <= nY - 1; j++)
                 {
-                    U[0, j] = (phi1(j * hY) - (alpha1 / (2 * hX)) * (4 * U[1, j] - U[2, j])) / (-3 * (alpha1 / (2 * hX)) + beta1);
+                    //U[0, j] = (phi1(j * hY) - (alpha1 / (2 * hX)) * (4 * U[1, j] - U[2, j])) / (-3 * (alpha1 / (2 * hX)) + beta1);
+                    U[0, j] = (phi1(j * hY) - (alpha1 / hX) * U[1, j]) / (-alpha1 / hX + beta1);
                 }
             }
             if (alpha2 == 1)
             {
-                for (int j = 0; j <= nY; j++)
+                for (int j = 1; j <= nY - 1; j++)
                 {
-                    U[nX, j] = (phi2(j * hY) - (alpha2 / (2 * hX)) * (-4 * U[nX - 1, j] + U[nX - 2, j])) / (3 * (alpha2 / (2 * hX)) + beta2);
+                    //U[nX, j] = (phi1(j * hY) - (alpha1 / (2 * hX)) * (4 * U[1, j] - U[2, j])) / (-3 * (alpha1 / (2 * hX)) + beta1);
+                    U[nX, j] = (phi2(j * hY) + (alpha2 / hX) * U[nX - 1, j]) / (alpha2 / hX + beta2);
                 }
             }
             if (alpha3 == 1)
             {
-                for (int i = 0; i <= nX; i++)
+                for (int i = 1; i <= nX - 1; i++)
                 {
-                    U[i, 0] = (phi3(i * hX) - (alpha3 / (2 * hY)) * (4 * U[i, 1] - U[i, 2])) / (-3 * (alpha3 / (2 * hY)) + beta3);
+                    //U[i, 0] = (phi3(i * hX) - (alpha3 / (2 * hY)) * (4 * U[i, 1] - U[i, 2])) / (-3 * (alpha3 / (2 * hY)) + beta3);
+                    U[i, 0] = (phi3(i * hX) - (alpha3 / hY) * U[i, 1]) / (-alpha3 / hY + beta3);
                 }
             }
             if (alpha4 == 1)
             {
-                for (int i = 0; i <= nX; i++)
+                for (int i = 1; i <= nX - 1; i++)
                 {
-                    U[i, nY] = (phi4(i * hX) - (alpha4 / (2 * hY)) * (-4 * U[i, nY - 1] + U[i, nY - 2])) / (3 * (alpha4 / (2 * hY)) + beta4);
+                    //U[i, nY] = (phi4(i * hX) - (alpha4 / (2 * hY)) * (-4 * U[i, nY - 1] + U[i, nY - 2])) / (3 * (alpha4 / (2 * hY)) + beta4);
+                    U[i, nY] = (phi4(i * hX) + (alpha4 / hY) * U[i, nY - 1]) / (alpha4 / hY + beta4);
                 }
             }
 

@@ -488,154 +488,88 @@ namespace Lab_5.MVVM.ViewModel
         private List<PlotData> CalculateHErrorPoints ()
         {
             List<PlotData> plotsData = new();
-            double hs = Math.Sqrt(2 * Values.a * 0.000001);
-            int n = (int) (xMax / (256 * hs));
+            int nMin = 5;
+            int stepSize = 5;
+            int steps = 5;
+            double t = 1f;
+            int k = 190;
+            int timeMoment = 20;
 
             if (explicitScheme == 1)
             {
                 if (twoFirstApproximation == 1)
                 {
-                    PlotData plotData = new();
-                    plotData.title = "Явная 2Т.1П.";
-                    double[,] errorPoints = new double[2, 9];
-                    for (int i = 8; i >= 0; i--)
-                    {
-                        double[,] U = model.FiniteDifferenceSolve(xMax, n * (int) Math.Pow(2, i), 0.001, 1000, 1, 1);
-                        double h = xMax / (n * Math.Pow(2, i));
-                        errorPoints[0, 8 - i] = h;
-                        errorPoints[1, 8 - i] = Math.Abs(U[1, (int) Math.Pow(2, i)] - Values.AnaliticalU(Math.Pow(2, i) * h, 1 * 0.000001));
-                    }
-                    plotData.U = errorPoints;
-                    plotsData.Add(plotData);
+                    plotsData.Add(ConstructErrorData("Явная 2Т.1П.", nMin, stepSize, steps, t, k, timeMoment, 1, 1));
                 }
                 if (threeSecondApproximation == 1)
                 {
-                    PlotData plotData = new();
-                    plotData.title = "Явная 3Т.2П.";
-                    double[,] errorPoints = new double[2, 9];
-                    for (int i = 8; i >= 0; i--)
-                    {
-                        double[,] U = model.FiniteDifferenceSolve(xMax, n * (int) Math.Pow(2, i), 0.001, 1000, 1, 2);
-                        double h = xMax / (n * Math.Pow(2, i));
-                        errorPoints[0, 8 - i] = h;
-                        errorPoints[1, 8 - i] = Math.Abs(U[1, (int) Math.Pow(2, i)] - Values.AnaliticalU(Math.Pow(2, i) * h, 1 * 0.000001));
-                    }
-                    plotData.U = errorPoints;
-                    plotsData.Add(plotData);
+                    plotsData.Add(ConstructErrorData("Явная 3Т.2П.", nMin, stepSize, steps, t, k, timeMoment, 1, 2));
                 }
                 if (twoSecondApproximation == 1)
                 {
-                    PlotData plotData = new();
-                    plotData.title = "Явная 2Т.2П.";
-                    double[,] errorPoints = new double[2, 9];
-                    for (int i = 8; i >= 0; i--)
-                    {
-                        double[,] U = model.FiniteDifferenceSolve(xMax, n * (int) Math.Pow(2, i), 0.001, 1000, 1, 3);
-                        double h = xMax / (n * Math.Pow(2, i));
-                        errorPoints[0, 8 - i] = h;
-                        errorPoints[1, 8 - i] = Math.Abs(U[1, (int) Math.Pow(2, i)] - Values.AnaliticalU(Math.Pow(2, i) * h, 1 * 0.000001));
-                    }
-                    plotData.U = errorPoints;
-                    plotsData.Add(plotData);
+                    plotsData.Add(ConstructErrorData("Явная 2Т.2П.", nMin, stepSize, steps, t, k, timeMoment, 1, 3));
                 }
             }
             if (implicitScheme == 1)
             {
                 if (twoFirstApproximation == 1)
                 {
-                    PlotData plotData = new();
-                    plotData.title = "Неявная 2Т.1П.";
-                    double[,] errorPoints = new double[2, 9];
-                    for (int i = 8; i >= 0; i--)
-                    {
-                        double[,] U = model.FiniteDifferenceSolve(xMax, n * (int) Math.Pow(2, i), 0.001, 1000, 2, 1);
-                        double h = xMax / (n * Math.Pow(2, i));
-                        errorPoints[0, 8 - i] = h;
-                        errorPoints[1, 8 - i] = Math.Abs(U[1, (int) Math.Pow(2, i)] - Values.AnaliticalU(Math.Pow(2, i) * h, 1 * 0.000001));
-                    }
-                    plotData.U = errorPoints;
-                    plotsData.Add(plotData);
+                    plotsData.Add(ConstructErrorData("Неявная 2Т.1П.", nMin, stepSize, steps, t, k, timeMoment, 2, 1));
                 }
                 if (threeSecondApproximation == 1)
                 {
-                    PlotData plotData = new();
-                    plotData.title = "Неявная 3Т.2П.";
-                    double[,] errorPoints = new double[2, 9];
-                    for (int i = 8; i >= 0; i--)
-                    {
-                        double[,] U = model.FiniteDifferenceSolve(xMax, n * (int) Math.Pow(2, i), 0.001, 1000, 2, 2);
-                        double h = xMax / (n * Math.Pow(2, i));
-                        errorPoints[0, 8 - i] = h;
-                        errorPoints[1, 8 - i] = Math.Abs(U[1, (int) Math.Pow(2, i)] - Values.AnaliticalU(Math.Pow(2, i) * h, 1 * 0.000001));
-                    }
-                    plotData.U = errorPoints;
-                    plotsData.Add(plotData);
+                    plotsData.Add(ConstructErrorData("Неявная 3Т.2П.", nMin, stepSize, steps, t, k, timeMoment, 2, 2));
                 }
                 if (twoSecondApproximation == 1)
                 {
-                    PlotData plotData = new();
-                    plotData.title = "Неявная 2Т.2П.";
-                    double[,] errorPoints = new double[2, 9];
-                    for (int i = 8; i >= 0; i--)
-                    {
-                        double[,] U = model.FiniteDifferenceSolve(xMax, n * (int) Math.Pow(2, i), 0.001, 1000, 2, 3);
-                        double h = xMax / (n * Math.Pow(2, i));
-                        errorPoints[0, 8 - i] = h;
-                        errorPoints[1, 8 - i] = Math.Abs(U[1, (int) Math.Pow(2, i)] - Values.AnaliticalU(Math.Pow(2, i) * h, 1 * 0.000001));
-                    }
-                    plotData.U = errorPoints;
-                    plotsData.Add(plotData);
+                    plotsData.Add(ConstructErrorData("Неявная 2Т.2П.", nMin, stepSize, steps, t, k, timeMoment, 2, 3));
                 }
             }
             if (cnScheme == 1)
             {
                 if (twoFirstApproximation == 1)
                 {
-                    PlotData plotData = new();
-                    plotData.title = "Кранка-Никлсона 2Т.1П.";
-                    double[,] errorPoints = new double[2, 9];
-                    for (int i = 8; i >= 0; i--)
-                    {
-                        double[,] U = model.FiniteDifferenceSolve(xMax, n * (int) Math.Pow(2, i), 0.001, 1000, 3, 1);
-                        double h = xMax / (n * Math.Pow(2, i));
-                        errorPoints[0, 8 - i] = h;
-                        errorPoints[1, 8 - i] = Math.Abs(U[1, (int) Math.Pow(2, i)] - Values.AnaliticalU(Math.Pow(2, i) * h, 1 * 0.000001));
-                    }
-                    plotData.U = errorPoints;
-                    plotsData.Add(plotData);
+                    plotsData.Add(ConstructErrorData("Кранка-Никлсона 2Т.1П.", nMin, stepSize, steps, t, k, timeMoment, 3, 1));
                 }
                 if (threeSecondApproximation == 1)
                 {
-                    PlotData plotData = new();
-                    plotData.title = "Кранка-Никлсона 3Т.2П.";
-                    double[,] errorPoints = new double[2, 9];
-                    for (int i = 8; i >= 0; i--)
-                    {
-                        double[,] U = model.FiniteDifferenceSolve(xMax, n * (int) Math.Pow(2, i), 0.001, 1000, 3, 2);
-                        double h = xMax / (n * Math.Pow(2, i));
-                        errorPoints[0, 8 - i] = h;
-                        errorPoints[1, 8 - i] = Math.Abs(U[1, (int) Math.Pow(2, i)] - Values.AnaliticalU(Math.Pow(2, i) * h, 1 * 0.000001));
-                    }
-                    plotData.U = errorPoints;
-                    plotsData.Add(plotData);
+                    plotsData.Add(ConstructErrorData("Кранка-Никлсона 3Т.2П.", nMin, stepSize, steps, t, k, timeMoment, 3, 2));
                 }
                 if (twoSecondApproximation == 1)
                 {
-                    PlotData plotData = new();
-                    plotData.title = "Кранка-Никлсона 2Т.2П.";
-                    double[,] errorPoints = new double[2, 9];
-                    for (int i = 8; i >= 0; i--)
-                    {
-                        double[,] U = model.FiniteDifferenceSolve(xMax, n * (int) Math.Pow(2, i), 0.001, 1000, 3, 3);
-                        double h = xMax / (n * Math.Pow(2, i));
-                        errorPoints[0, 8 - i] = h;
-                        errorPoints[1, 8 - i] = Math.Abs(U[1, (int) Math.Pow(2, i)] - Values.AnaliticalU(Math.Pow(2, i) * h, 1 * 0.000001));
-                    }
-                    plotData.U = errorPoints;
-                    plotsData.Add(plotData);
+                    plotsData.Add(ConstructErrorData("Кранка-Никлсона 2Т.2П.", nMin, stepSize, steps, t, k, timeMoment, 3, 3));
                 }
             }
             return plotsData;
+        }
+
+        private PlotData ConstructErrorData (string title, int nMin, int stepSize, int steps, double t, int k, int timePoint, int scheme, int approximation)
+        {
+            PlotData plotData = new();
+            plotData.title = title;
+            double[,] errorPoints = new double[2, steps];
+            double thao = t / k;
+
+            for (int s = 0; s < steps; s++)
+            {
+                int n = nMin + s * stepSize;
+                double hX = Values.l / n;
+                double[,] eU = model.FiniteDifferenceSolve(xMax, n, t, k, scheme, approximation);
+
+                double errorSumm = 0;
+                int errorPointsAmount = 0;
+                for (int i = 0; i <= n; i++)
+                {
+                    errorSumm += Math.Pow(Values.AnaliticalU(i * hX, timePoint * thao) - eU[timePoint, i], 2);
+                    errorPointsAmount += 1;
+                }
+                //MessageBox.Show($"Шаг = {hX} Ошибка = {errorSumm / errorPointsAmount} количество точек {errorPointsAmount} {steps - s - 1}");
+                errorPoints[0, steps - s - 1] = hX;
+                errorPoints[1, steps - s - 1] = errorSumm / errorPointsAmount;
+            }
+
+            plotData.U = errorPoints;
+            return plotData;
         }
 
         private double AnaliticalU (double x)

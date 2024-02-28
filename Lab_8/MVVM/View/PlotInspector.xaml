@@ -1,0 +1,43 @@
+﻿<Window x:Class="Lab_8.MVVM.View.PlotInspector"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lab_8.MVVM.View"
+        xmlns:viewModel="clr-namespace:Lab_8.MVVM.ViewModel"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        mc:Ignorable="d"
+        Title="PlotInspector"
+        Height="450"
+        Width="800">
+
+    <Window.DataContext>
+        <viewModel:PlotInspectorViewModel />
+    </Window.DataContext>
+
+    <Grid Background="#4d4d4d">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="7*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Background="#272727"
+                Margin="0,0,0,2">
+
+            <Viewbox HorizontalAlignment="Center"
+                     Margin="5,0,5,0">
+                <TextBlock Text="{Binding Title}"
+                           Foreground="#fff" />
+            </Viewbox>
+        </Border>
+
+        <Border Grid.Row="1"
+                Background="#272727">
+
+            <oxy:PlotView Grid.Row="1"
+                          Model="{Binding PlotModel}"
+                          Margin="3"/>
+        </Border>
+    </Grid>
+</Window>

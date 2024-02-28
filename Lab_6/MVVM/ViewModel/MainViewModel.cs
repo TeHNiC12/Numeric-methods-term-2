@@ -505,11 +505,12 @@ namespace Lab_6.MVVM.ViewModel
         private List<PlotData> CalculateHErrorPoints ()
         {
             List<PlotData> plotsData = new();
-            double T = 0.5;
-            int power = 8;
-            int maxN = 5 * (int) Math.Pow(2, power);
-            int K = (int) (Values.a * T * maxN / Values.l) + 2;
-            int tMoment = 30;
+            int nMin = 6;
+            int stepSize = 10;
+            int steps = 10;
+            double t = 1f;
+            int k = 40;
+            int timeMoment = 5;
 
             if (explicitScheme == 1)
             {
@@ -517,33 +518,33 @@ namespace Lab_6.MVVM.ViewModel
                 {
                     if (twoFirstApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Явная 2т.1п. нач:2т.1п.", power, tMoment, T, K, 1, 1, 1));
+                        plotsData.Add(ConstructErrorData("Явная 2т.1п. нач:2т.1п.", nMin, stepSize, steps, t, k, timeMoment, 1, 1, 1));
                     }
                     if (twoSecondApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Явная 2т.1п. нач:2т.2п.", power, tMoment, T, K, 1, 1, 2));
+                        plotsData.Add(ConstructErrorData("Явная 2т.1п. нач:2т.2п.", nMin, stepSize, steps, t, k, timeMoment, 1, 1, 2));
                     }
                 }
                 if (threeSecondApproximation == 1)
                 {
                     if (twoFirstApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Явная 3т.2п. нач:2т.1п.", power, tMoment, T, K, 1, 2, 1));
+                        plotsData.Add(ConstructErrorData("Явная 3т.2п. нач:2т.1п.", nMin, stepSize, steps, t, k, timeMoment, 1, 2, 1));
                     }
                     if (twoSecondApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Явная 3т.2п. нач:2т.2п.", power, tMoment, T, K, 1, 2, 2));
+                        plotsData.Add(ConstructErrorData("Явная 3т.2п. нач:2т.2п.", nMin, stepSize, steps, t, k, timeMoment, 1, 2, 2));
                     }
                 }
                 if (twoSecondApproximation == 1)
                 {
                     if (twoFirstApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Явная 2т.2п. нач:2т.1п.", power, tMoment, T, K, 1, 3, 1));
+                        plotsData.Add(ConstructErrorData("Явная 2т.2п. нач:2т.1п.", nMin, stepSize, steps, t, k, timeMoment, 1, 3, 1));
                     }
                     if (twoSecondApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Явная 2т.2п. нач:2т.2п.", power, tMoment, T, K, 1, 3, 2));
+                        plotsData.Add(ConstructErrorData("Явная 2т.2п. нач:2т.2п.", nMin, stepSize, steps, t, k, timeMoment, 1, 3, 2));
                     }
                 }
             }
@@ -553,33 +554,33 @@ namespace Lab_6.MVVM.ViewModel
                 {
                     if (twoFirstApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Неявная 2т.1п. нач:2т.1п.", power, tMoment, T, K, 2, 1, 1));
+                        plotsData.Add(ConstructErrorData("Неявная 2т.1п. нач:2т.1п.", nMin, stepSize, steps, t, k, timeMoment, 2, 1, 1));
                     }
                     if (twoSecondApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Неявная 2т.1п. нач:2т.2п.", power, tMoment, T, K, 2, 1, 2));
+                        plotsData.Add(ConstructErrorData("Неявная 2т.1п. нач:2т.2п.", nMin, stepSize, steps, t, k, timeMoment, 2, 1, 2));
                     }
                 }
                 if (threeSecondApproximation == 1)
                 {
                     if (twoFirstApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Неявная 3т.2п. нач:2т.1п.", power, tMoment, T, K, 2, 2, 1));
+                        plotsData.Add(ConstructErrorData("Неявная 3т.2п. нач:2т.1п.", nMin, stepSize, steps, t, k, timeMoment, 2, 2, 1));
                     }
                     if (twoSecondApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Неявная 3т.2п. нач:2т.2п.", power, tMoment, T, K, 2, 2, 2));
+                        plotsData.Add(ConstructErrorData("Неявная 3т.2п. нач:2т.2п.", nMin, stepSize, steps, t, k, timeMoment, 2, 2, 2));
                     }
                 }
                 if (twoSecondApproximation == 1)
                 {
                     if (twoFirstApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Неявная 2т.2п. нач:2т.1п.", power, tMoment, T, K, 2, 3, 1));
+                        plotsData.Add(ConstructErrorData("Неявная 2т.2п. нач:2т.1п.", nMin, stepSize, steps, t, k, timeMoment, 2, 3, 1));
                     }
                     if (twoSecondApproximationStart == 1)
                     {
-                        plotsData.Add(ConstructErrorData("Неявная 2т.2п. нач:2т.2п.", power, tMoment, T, K, 2, 3, 2));
+                        plotsData.Add(ConstructErrorData("Неявная 2т.2п. нач:2т.2п.", nMin, stepSize, steps, t, k, timeMoment, 2, 3, 2));
                     }
                 }
             }
@@ -593,18 +594,31 @@ namespace Lab_6.MVVM.ViewModel
             plotData.U = model.FiniteDifferenceSolve(xMax, n, rightTimeLimit, k, scheme, approximation, startApproximation);
             return plotData;
         }
-        private PlotData ConstructErrorData (string title, int power, int tMoment, double T, int K, int scheme, int approximation, int startApproximation)
+        private PlotData ConstructErrorData (string title, int nMin, int stepSize, int steps, double t, int k, int timePoint, int scheme, int approximation, int startApproximation)
         {
             PlotData plotData = new();
-            plotData.title = "title";
-            double[,] errorPoints = new double[2, power + 1];
-            for (int i = power; i >= 0; i--)
+            plotData.title = title;
+            double[,] errorPoints = new double[2, steps];
+            double thao = t / k;
+
+            for (int s = 0; s < steps; s++)
             {
-                double[,] U = model.FiniteDifferenceSolve(xMax, 5 * (int) Math.Pow(2, i), T, K, scheme, approximation, startApproximation);
-                double h = xMax / (5 * Math.Pow(2, i));
-                errorPoints[0, power - i] = h;
-                errorPoints[1, power - i] = Math.Abs(U[tMoment, (int) Math.Pow(2, i)] - Values.AnaliticalU(Math.Pow(2, i) * h, tMoment * (T / K)));
+                int n = nMin + s * stepSize;
+                double hX = Values.l / n;
+                double[,] eU = model.FiniteDifferenceSolve(xMax, n, t, k, scheme, approximation, startApproximation);
+
+                double errorSumm = 0;
+                int errorPointsAmount = 0;
+                for (int i = 0; i <= n; i++)
+                {
+                    errorSumm += Math.Pow(Values.AnaliticalU(i * hX, timePoint * thao) - eU[timePoint, i], 2);
+                    errorPointsAmount += 1;
+                }
+                //MessageBox.Show($"Шаг = {hX} Ошибка = {errorSumm / errorPointsAmount} количество точек {errorPointsAmount} {steps - s - 1}");
+                errorPoints[0, steps - s - 1] = hX;
+                errorPoints[1, steps - s - 1] = errorSumm / errorPointsAmount;
             }
+
             plotData.U = errorPoints;
             return plotData;
         }
