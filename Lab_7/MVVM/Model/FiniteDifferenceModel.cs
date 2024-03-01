@@ -1,4 +1,7 @@
-﻿using Lab_7.DefaultValues;
+﻿using Lab_7.Core;
+using Lab_7.DefaultValues;
+using System.Diagnostics;
+using System.Windows;
 
 namespace Lab_7.MVVM.Model
 {
@@ -15,6 +18,7 @@ namespace Lab_7.MVVM.Model
             if (solver == 1)
             {
                 Tuple<double[,], int> results = Libman(U, nX, hX, nY, hY, epsilon);
+                //Tuple<double[,], int> results = ConjugateGradientMethod(U, nX, hX, nY, hY, epsilon);
                 U = results.Item1;
                 step = results.Item2;
             }
@@ -43,6 +47,7 @@ namespace Lab_7.MVVM.Model
             double[,] curU = U;
             int stepSolved = -1;
 
+            var watch = Stopwatch.StartNew();
             for (int k = 1; k > 0; k++)
             {
                 prevU = curU;
@@ -71,8 +76,124 @@ namespace Lab_7.MVVM.Model
                     break;
                 }
             }
+            watch.Stop();
+            if (displayExecutionTime)
+            {
+                MessageBox.Show($"Время выполнения: {watch.Elapsed.TotalMilliseconds} мс.");
+            }
 
             return new Tuple<double[,], int>(curU, stepSolved);
+        }
+
+        private Tuple<double[,], int> ConjugateGradientMethod (double[,] U, int nX, double hX, int nY, double hY, double Epsilon)
+        {
+            int n = (nX - 1) * (nY - 1);
+            double[,] A = new double[n, n];
+            double[,] b = new double[n, 1];
+            double[,] x0 = new double[n, 1];
+
+            for (int i = 1; i <= nX - 1; i++)
+            {
+                for (int j = 1; j <= nY - 1; j++)
+                {
+                    x0[(j - 1) * (nX - 1) + i - 1, 0] = U[i, j];
+
+                    if (i == 1)
+                    {
+                        if (j == 1)
+                        {
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + i - 1] = -2f / Math.Pow(hX, 2) - 2F / Math.Pow(hY, 2) - c;
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i + 1) - 1] = -bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, ((j + 1) - 1) * (nX - 1) + i - 1] = -bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            b[(j - 1) * (nX - 1) + i - 1, 0] = F(i * hX, j * hY) - (bY / (2 * hY) + 1f / Math.Pow(hY, 2)) * U[1, 0] - (bX / (2 * hX) + 1f / Math.Pow(hX, 2)) * U[0, 1];
+                        }
+                        else if (j == nY - 1)
+                        {
+                            A[(j - 1) * (nX - 1) + i - 1, ((j - 1) - 1) * (nX - 1) + i - 1] = bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + i - 1] = -2f / Math.Pow(hX, 2) - 2F / Math.Pow(hY, 2) - c;
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i + 1) - 1] = -bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            b[(j - 1) * (nX - 1) + i - 1, 0] = F(i * hX, j * hY) - (bX / (2 * hX) + 1f / Math.Pow(hX, 2)) * U[0, nY - 1] - (-bY / (2 * hY) + 1f / Math.Pow(hY, 2)) * U[1, nY];
+                        }
+                        else
+                        {
+                            A[(j - 1) * (nX - 1) + i - 1, ((j - 1) - 1) * (nX - 1) + i - 1] = bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + i - 1] = -2f / Math.Pow(hX, 2) - 2F / Math.Pow(hY, 2) - c;
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i + 1) - 1] = -bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, ((j + 1) - 1) * (nX - 1) + i - 1] = -bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            b[(j - 1) * (nX - 1) + i - 1, 0] = F(i * hX, j * hY) - (bX / (2 * hX) + 1f / Math.Pow(hX, 2)) * U[0, j];
+                        }
+                    }
+                    else if (i == nX - 1)
+                    {
+                        if (j == 1)
+                        {
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i - 1) - 1] = bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + i - 1] = -2f / Math.Pow(hX, 2) - 2F / Math.Pow(hY, 2) - c;
+                            A[(j - 1) * (nX - 1) + i - 1, ((j + 1) - 1) * (nX - 1) + i - 1] = -bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            b[(j - 1) * (nX - 1) + i - 1, 0] = F(i * hX, j * hY) - (bY / (2 * hY) + 1f / Math.Pow(hY, 2)) * U[nX - 1, 0] - (-bX / (2 * hX) + 1f / Math.Pow(hX, 2)) * U[nX, 1];
+                        }
+                        else if (j == nY - 1)
+                        {
+                            A[(j - 1) * (nX - 1) + i - 1, ((j - 1) - 1) * (nX - 1) + i - 1] = bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i - 1) - 1] = bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + i - 1] = -2f / Math.Pow(hX, 2) - 2F / Math.Pow(hY, 2) - c;
+                            b[(j - 1) * (nX - 1) + i - 1, 0] = F(i * hX, j * hY) - (-bX / (2 * hX) + 1f / Math.Pow(hX, 2)) * U[nX, nY - 1] - (-bY / (2 * hY) + 1f / Math.Pow(hY, 2)) * U[nX - 1, nY];
+                        }
+                        else
+                        {
+                            A[(j - 1) * (nX - 1) + i - 1, ((j - 1) - 1) * (nX - 1) + i - 1] = bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i - 1) - 1] = bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + i - 1] = -2f / Math.Pow(hX, 2) - 2F / Math.Pow(hY, 2) - c;
+                            A[(j - 1) * (nX - 1) + i - 1, ((j + 1) - 1) * (nX - 1) + i - 1] = -bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            b[(j - 1) * (nX - 1) + i - 1, 0] = F(i * hX, j * hY) - (-bX / (2 * hX) + 1f / Math.Pow(hX, 2)) * U[nX, j];
+                        }
+                    }
+                    else
+                    {
+                        if (j == 1)
+                        {
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i - 1) - 1] = bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + i - 1] = -2f / Math.Pow(hX, 2) - 2F / Math.Pow(hY, 2) - c;
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i + 1) - 1] = -bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, ((j + 1) - 1) * (nX - 1) + i - 1] = -bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            b[(j - 1) * (nX - 1) + i - 1, 0] = F(i * hX, j * hY) - (bY / (2 * hY) + 1f / Math.Pow(hY, 2)) * U[i, 0];
+                        }
+                        else if (j == nY - 1)
+                        {
+                            A[(j - 1) * (nX - 1) + i - 1, ((j - 1) - 1) * (nX - 1) + i - 1] = bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i - 1) - 1] = bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + i - 1] = -2f / Math.Pow(hX, 2) - 2F / Math.Pow(hY, 2) - c;
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i + 1) - 1] = -bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            b[(j - 1) * (nX - 1) + i - 1, 0] = F(i * hX, j * hY) - (-bY / (2 * hY) + 1f / Math.Pow(hY, 2)) * U[i, nY];
+                        }
+                        else
+                        {
+                            A[(j - 1) * (nX - 1) + i - 1, ((j - 1) - 1) * (nX - 1) + i - 1] = bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i - 1) - 1] = bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + i - 1] = -2f / Math.Pow(hX, 2) - 2F / Math.Pow(hY, 2) - c;
+                            A[(j - 1) * (nX - 1) + i - 1, (j - 1) * (nX - 1) + (i + 1) - 1] = -bX / (2 * hX) + 1f / Math.Pow(hX, 2);
+                            A[(j - 1) * (nX - 1) + i - 1, ((j + 1) - 1) * (nX - 1) + i - 1] = -bY / (2 * hY) + 1f / Math.Pow(hY, 2);
+                            b[(j - 1) * (nX - 1) + i - 1, 0] = F(i * hX, j * hY);
+                        }
+                    }
+                }
+            }
+
+            var watch = Stopwatch.StartNew();
+            Tuple<double[,], int> result = solver.Solve(A, b, x0, Epsilon);
+            watch.Stop();
+            if (displayExecutionTime)
+            {
+                MessageBox.Show($"Время выполнения: {watch.Elapsed.TotalMilliseconds} мс.");
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                U[n % (nX - 1), n / (nX - 1)] = result.Item1[i, 0];
+            }
+
+            UpdateBorderValues(U, nX, hX, nY, hY);
+            return new Tuple<double[,], int>(U, result.Item2);
         }
 
         private Tuple<double[,], int> Zeidel (double[,] U, int nX, double hX, int nY, double hY, double Epsilon)
@@ -81,6 +202,7 @@ namespace Lab_7.MVVM.Model
             double[,] curU = U;
             int stepSolved = -1;
 
+            var watch = Stopwatch.StartNew();
             for (int k = 1; k > 0; k++)
             {
                 prevU = curU;
@@ -109,6 +231,11 @@ namespace Lab_7.MVVM.Model
                     break;
                 }
             }
+            watch.Stop();
+            if (displayExecutionTime)
+            {
+                MessageBox.Show($"Время выполнения: {watch.Elapsed.TotalMilliseconds} мс.");
+            }
 
             return new Tuple<double[,], int>(curU, stepSolved);
         }
@@ -119,6 +246,7 @@ namespace Lab_7.MVVM.Model
             double[,] curU = U;
             int stepSolved = -1;
 
+            var watch = Stopwatch.StartNew();
             for (int k = 1; k > 0; k++)
             {
                 prevU = curU;
@@ -155,6 +283,11 @@ namespace Lab_7.MVVM.Model
                     stepSolved = k;
                     break;
                 }
+            }
+            watch.Stop();
+            if (displayExecutionTime)
+            {
+                MessageBox.Show($"Время выполнения: {watch.Elapsed.TotalMilliseconds} мс.");
             }
 
             return new Tuple<double[,], int>(curU, stepSolved);
@@ -312,5 +445,10 @@ namespace Lab_7.MVVM.Model
         private int alpha4 = Values.alpha4;
         private int beta4 = Values.beta4;
         private Func<double, double> phi4 = x => Values.phi4(x);
+
+        //Выводит время исполнения алгоритма
+        private bool displayExecutionTime = false;
+
+        ConjugateGradient solver = new();
     }
 }
